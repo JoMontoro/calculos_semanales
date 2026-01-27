@@ -1,0 +1,26 @@
+{
+  "name": "calculos-semanales",
+  "version": "1.0.0",
+  "description": "Uso personal para clculos de compra y venta",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JoMontoro/Calculos-semanales.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JoMontoro/Calculos-semanales/issues"
+  },
+  "homepage": "https://github.com/JoMontoro/Calculos-semanales#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "mysql2": "^3.16.2"
+  }
+}

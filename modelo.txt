@@ -1,0 +1,13 @@
+Titulo de la pagina 
+
+
+1. Capital de inversión 
+
+
+2. Nombres y costos de los insumos de la sangria 
+
+
+
+3. votar el calculo de la ganacion, el total de inversión , y botones para guardar, borrar y cancelar para trabajarlo en una bd
+
+
