@@ -21,10 +21,10 @@ const db = mysql.createConnection({
 // Probar conexión
 db.connect(err => {
   if (err) {
-    console.error("Error al conectar con MySQL en Railway:", err);
+    console.error("❌ Error al conectar con MySQL en Railway:", err);
     return;
   }
-  console.log("Conectado correctamente a MySQL en Railway!");
+  console.log("✅ Conectado correctamente a MySQL en Railway!");
 });
 
 // 🔹 Ruta para guardar datos
@@ -51,15 +51,29 @@ app.post("/guardar", (req, res) => {
     d.ganancia
   ], err => {
     if (err) {
-      console.error("Error al guardar en MySQL:", err);
+      console.error("❌ Error al guardar en MySQL:", err);
       return res.status(500).json({ error: err });
     }
+    console.log("💾 Datos guardados correctamente:", d);
     res.json({ mensaje: "Guardado correctamente" });
+  });
+});
+
+// 🔹 Nueva ruta para ver datos guardados
+app.get("/datos", (req, res) => {
+  const sql = "SELECT * FROM calculo_semanal ORDER BY id DESC"; // Ordenar por último ingresado
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("❌ Error al obtener datos:", err);
+      return res.status(500).json({ error: err });
+    }
+    res.json(results);
   });
 });
 
 // 🔹 Puerto dinámico para Railway
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor activo en puerto ${PORT}`);
+  console.log(`🚀 Servidor activo en puerto ${PORT}`);
+  console.log(`🔗 Ver los datos en: http://localhost:${PORT}/datos`);
 });
