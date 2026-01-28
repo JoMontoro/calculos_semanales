@@ -159,23 +159,14 @@ function calcular() {
 function guardar() {
   const d = calcular();
 
-  fetch("/guardar", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      capital: d.capital,
-      vino: d.vino,
-      naranja: d.naranja,
-      azucar: d.azucar,
-      pina: d.pina,
-      botella: d.botella,
-      total_insumos: d.total,
-      ganancia: d.ganancia
-    })
-  })
-  .then(r => r.json())
-  .then(d => alert(d.mensaje))
-  .catch(() => alert("Error al guardar"));
+fetch("https://calculossemanales-production.up.railway.app/guardar", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(datos)
+})
+.then(res => res.json())
+.then(resp => console.log(resp))
+.catch(err => console.error(err));
 }
 function limpiar() {
   document.getElementById("capital").value = "";
