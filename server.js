@@ -3,29 +3,36 @@ const mysql = require("mysql2");
 const path = require("path");
 const cors = require("cors");
 
-const app = express(); // 👈 ESTO ES CLAVE
+const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "Diseño")));
+app.use(express.static(path.join(__dirname, "Diseño"))); // Carpeta de frontend
 
+// Conexión a MySQL usando la URL directa de Railway
 const db = mysql.createConnection({
-  host: "127.0.0.1",
-  user: "root",
-  password: "root", // vacío en XAMPP normalmente
-  database: "calculo_semanal",
-  port: 3306,
   uri: "mysql://root:LVHvvPJeGQlpsowMbTWdDPDCNxdcocvr@shinkansen.proxy.rlwy.net:25065/railway"
 });
 
-db.connect(err => {
+// Alternativa si mysql2 no soporta 'uri' directamente:
+// Desglosa los datos en propiedades:
+const db2 = mysql.createConnection({
+  host: "shinkansen.proxy.rlwy.net",
+  user: "root",
+  password: "LVHvvPJeGQlpsowMbTWdDPDCNxdcocvr",
+  database: "railway",
+  port: 25065
+});
+
+db2.connect(err => {
   if (err) {
     console.error("Error BD:", err);
     return;
   }
-  console.log("Conectado a MySQL");
+  console.log("Conectado a MySQL en Railway!");
 });
 
+// Ruta para guardar datos
 app.post("/guardar", (req, res) => {
   const d = req.body;
 
@@ -35,7 +42,7 @@ app.post("/guardar", (req, res) => {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  db.query(sql, [
+  db2.query(sql, [
     d.capital,
     d.vino,
     d.naranja,
@@ -53,6 +60,8 @@ app.post("/guardar", (req, res) => {
   });
 });
 
-app.listen(3000, () => {
-  console.log("Servidor activo en http://localhost:3000");
+// Puerto dinámico para Railway
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor activo en http://localhost:${PORT}`);
 });
