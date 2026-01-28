@@ -18,46 +18,24 @@ const db = mysql.createConnection({
   port: 25065
 });
 
-// 🔹 Crear la tabla automáticamente si no existe
-const crearTablaSQL = `
-CREATE TABLE IF NOT EXISTS calculo_semanal (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    capital DECIMAL(10,2) NOT NULL,
-    vino DECIMAL(10,2),
-    naranja DECIMAL(10,2),
-    azucar DECIMAL(10,2),
-    pina DECIMAL(10,2),
-    botella DECIMAL(10,2),
-    total_insumos DECIMAL(10,2),
-    ganancia DECIMAL(10,2),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-`;
-
-db.connect(async (err) => {
+// Probar conexión
+db.connect(err => {
   if (err) {
     console.error("❌ Error al conectar con MySQL en Railway:", err);
-    process.exit(1);
+    process.exit(1); // Salir si no puede conectarse
   }
   console.log("✅ Conectado correctamente a MySQL en Railway!");
-
-  // Crear tabla si no existe
-  try {
-    await db.promise().query(crearTablaSQL);
-    console.log("📦 Tabla 'calculo_semanal' lista ✅");
-  } catch (err) {
-    console.error("❌ Error al crear la tabla:", err);
-    process.exit(1);
-  }
 });
 
-// 🔹 Resto de endpoints...
+// 🔹 Endpoint de prueba para Railway
 app.get("/", (req, res) => {
   res.send("✅ Backend funcionando correctamente");
 });
 
+// 🔹 Ruta para guardar datos
 app.post("/guardar", (req, res) => {
   const d = req.body;
+
   if (!d.capital) return res.status(400).json({ error: "Faltan datos" });
 
   const sql = `
@@ -68,14 +46,14 @@ app.post("/guardar", (req, res) => {
 
   db.query(sql, [
     d.capital,
-    d.vino || 0,
-    d.naranja || 0,
-    d.azucar || 0,
-    d.pina || 0,
-    d.botella || 0,
-    d.total_insumos || 0,
-    d.ganancia || 0
-  ], (err) => {
+    d.vino,
+    d.naranja,
+    d.azucar,
+    d.pina,
+    d.botella,
+    d.total_insumos,
+    d.ganancia
+  ], err => {
     if (err) {
       console.error("❌ Error al guardar en MySQL:", err);
       return res.status(500).json({ error: err });
@@ -85,6 +63,7 @@ app.post("/guardar", (req, res) => {
   });
 });
 
+// 🔹 Ruta para ver datos
 app.get("/datos", (req, res) => {
   const sql = "SELECT * FROM calculo_semanal ORDER BY id DESC";
   db.query(sql, (err, results) => {
@@ -96,6 +75,7 @@ app.get("/datos", (req, res) => {
   });
 });
 
+// 🔹 Puerto dinámico obligatorio en Railway
 const PORT = process.env.PORT;
 if (!PORT) {
   console.error("❌ No se encontró la variable de entorno PORT");
