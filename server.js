@@ -7,10 +7,20 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "Diseño")));
+app.use(express.static(path.join(__dirname, "Diseño"))); // Carpeta de frontend
 
-// 🔹 Conexión a MySQL en Railway
+// Conexión a MySQL usando la URL directa de Railway
 const db = mysql.createConnection({
+  host: "shinkansen.proxy.rlwy.net",
+  user: "root",
+  password: "LVHvvPJeGQlpsowMbTWdDPDCNxdcocvr",
+  database: "railway",
+  port: 25065});
+  
+
+// Alternativa si mysql2 no soporta 'uri' directamente:
+// Desglosa los datos en propiedades:
+const db2 = mysql.createConnection({
   host: "shinkansen.proxy.rlwy.net",
   user: "root",
   password: "LVHvvPJeGQlpsowMbTWdDPDCNxdcocvr",
@@ -18,25 +28,17 @@ const db = mysql.createConnection({
   port: 25065
 });
 
-// Probar conexión
-db.connect(err => {
+db2.connect(err => {
   if (err) {
-    console.error("❌ Error al conectar con MySQL en Railway:", err);
-    process.exit(1); // Salir si no puede conectarse
+    console.error("Error BD:", err);
+    return;
   }
-  console.log("✅ Conectado correctamente a MySQL en Railway!");
+  console.log("Conectado a MySQL en Railway!");
 });
 
-// 🔹 Endpoint de prueba para Railway
-app.get("/", (req, res) => {
-  res.send("✅ Backend funcionando correctamente");
-});
-
-// 🔹 Ruta para guardar datos
+// Ruta para guardar datos
 app.post("/guardar", (req, res) => {
   const d = req.body;
-
-  if (!d.capital) return res.status(400).json({ error: "Faltan datos" });
 
   const sql = `
     INSERT INTO calculo_semanal
@@ -44,7 +46,7 @@ app.post("/guardar", (req, res) => {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  db.query(sql, [
+  db2.query(sql, [
     d.capital,
     d.vino,
     d.naranja,
@@ -55,34 +57,15 @@ app.post("/guardar", (req, res) => {
     d.ganancia
   ], err => {
     if (err) {
-      console.error("❌ Error al guardar en MySQL:", err);
+      console.error(err);
       return res.status(500).json({ error: err });
     }
-    console.log("💾 Datos guardados correctamente:", d);
     res.json({ mensaje: "Guardado correctamente" });
   });
 });
 
-// 🔹 Ruta para ver datos
-app.get("/datos", (req, res) => {
-  const sql = "SELECT * FROM calculo_semanal ORDER BY id DESC";
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error("❌ Error al obtener datos:", err);
-      return res.status(500).json({ error: err });
-    }
-    res.json(results);
-  });
-});
-
-// 🔹 Puerto dinámico obligatorio en Railway
-const PORT = process.env.PORT;
-if (!PORT) {
-  console.error("❌ No se encontró la variable de entorno PORT");
-  process.exit(1);
-}
-
+// Puerto dinámico para Railway
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor activo en puerto ${PORT}`);
-  console.log(`🔗 Ruta para ver datos: /datos`);
+  console.log(`Servidor activo en http://localhost:${PORT}`);
 });
