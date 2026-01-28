@@ -11,3 +11,4 @@ Titulo de la pagina
 3. votar el calculo de la ganacion, el total de inversión , y botones para guardar, borrar y cancelar para trabajarlo en una bd
 
 
+https://youtu.be/SsDAeDDSuN0?si=3t6vuGfFCa-sY9Bx

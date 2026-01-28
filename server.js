@@ -14,7 +14,8 @@ const db = mysql.createConnection({
   user: "root",
   password: "root", // vacío en XAMPP normalmente
   database: "calculo_semanal",
-  port: 3306
+  port: 3306,
+  uri: "mysql://root:LVHvvPJeGQlpsowMbTWdDPDCNxdcocvr@shinkansen.proxy.rlwy.net:25065/railway"
 });
 
 db.connect(err => {
