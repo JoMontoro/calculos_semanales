@@ -5,36 +5,34 @@ const cors = require("cors");
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "Diseño"))); // Carpeta de frontend
+app.use(cors()); // Permite que Vercel acceda al backend
+app.use(express.json()); // Permite recibir JSON
+app.use(express.static(path.join(__dirname, "Diseño"))); // Carpeta del frontend
 
-// Conexión a MySQL usando la URL directa de Railway
+// 🔹 Conexión a MySQL en Railway
 const db = mysql.createConnection({
-  uri: "mysql://root:LVHvvPJeGQlpsowMbTWdDPDCNxdcocvr@shinkansen.proxy.rlwy.net:25065/railway"
+  host: "shinkansen.proxy.rlwy.net",          // Host de Railway
+  user: "root",                               // Usuario de Railway
+  password: "LVHvvPJeGQlpsowMbTWdDPDCNxdcocvr", // Contraseña
+  database: "railway",                        // Nombre de la base
+  port: 25065                                 // Puerto de Railway
 });
 
-// Alternativa si mysql2 no soporta 'uri' directamente:
-// Desglosa los datos en propiedades:
-const db2 = mysql.createConnection({
-  host: "shinkansen.proxy.rlwy.net",
-  user: "root",
-  password: "LVHvvPJeGQlpsowMbTWdDPDCNxdcocvr",
-  database: "railway",
-  port: 25065
-});
-
-db2.connect(err => {
+// Probar conexión
+db.connect(err => {
   if (err) {
-    console.error("Error BD:", err);
+    console.error("Error al conectar con MySQL en Railway:", err);
     return;
   }
-  console.log("Conectado a MySQL en Railway!");
+  console.log("Conectado correctamente a MySQL en Railway!");
 });
 
-// Ruta para guardar datos
+// 🔹 Ruta para guardar datos
 app.post("/guardar", (req, res) => {
   const d = req.body;
+
+  // Verificación básica
+  if (!d.capital) return res.status(400).json({ error: "Faltan datos" });
 
   const sql = `
     INSERT INTO calculo_semanal
@@ -42,7 +40,7 @@ app.post("/guardar", (req, res) => {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  db2.query(sql, [
+  db.query(sql, [
     d.capital,
     d.vino,
     d.naranja,
@@ -53,15 +51,15 @@ app.post("/guardar", (req, res) => {
     d.ganancia
   ], err => {
     if (err) {
-      console.error(err);
+      console.error("Error al guardar en MySQL:", err);
       return res.status(500).json({ error: err });
     }
     res.json({ mensaje: "Guardado correctamente" });
   });
 });
 
-// Puerto dinámico para Railway
+// 🔹 Puerto dinámico para Railway
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor activo en http://localhost:${PORT}`);
+  console.log(`Servidor activo en puerto ${PORT}`);
 });
