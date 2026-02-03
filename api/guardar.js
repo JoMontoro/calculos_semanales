@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     const d = req.body;
 
     const { data, error } = await supabase
-      .from("calculos") // 👈 cambia esto si tu tabla tiene otro nombre
+      .from("calculo_semanal")
       .insert([
         {
           capital: d.capital,
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
           azucar: d.azucar,
           pina: d.pina,
           botella: d.botella,
-          total_insumos: d.total_insumos,
+          total_insumos: d.total,
           ganancia: d.ganancia
         }
       ]);
@@ -37,6 +37,7 @@ export default async function handler(req, res) {
     if (error) throw error;
 
     return res.status(200).json({
+      ok: true,
       mensaje: "Datos guardados en Supabase ✅",
       data
     });
@@ -44,8 +45,8 @@ export default async function handler(req, res) {
   } catch (err) {
     console.error("ERROR:", err);
     return res.status(500).json({
-      error: "Error en el servidor",
-      detalle: err.message
+      ok: false,
+      error: err.message
     });
   }
 }
